@@ -6,99 +6,62 @@ namespace _3dgame;
 
 public class Game1 : Game {
     private GraphicsDeviceManager _graphics;
-    private SpriteBatch _spriteBatch;
-
-    private Model _model;
-    private Vector3 position = Vector3.One;
-    private float zoom = 2500;
-    private float rotationY = 0.0f;
-    private float rotationX = 0.0f;
-    private Matrix gameWorldRotation;
-    float speed = 10f;
+    private GameObject ground;
+    private Camera gameCamera;
+    private FuelCarrier fuelCarrier;
+    private KeyboardState lastKeyboardState = new KeyboardState();
+    private KeyboardState currentKeyboardState = new KeyboardState();
 
     public Game1() {
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
+        _graphics.SynchronizeWithVerticalRetrace = true;
+        _graphics.ApplyChanges();
         IsMouseVisible = true;
     }
 
     protected override void Initialize() {
+        ground = new GameObject();
+        gameCamera = new Camera();
         base.Initialize();
     }
 
     protected override void LoadContent() {
-        _spriteBatch = new SpriteBatch(GraphicsDevice);
-        _model = Content.Load<Model>("fuelcarrier");
-    }
-
-    private void UpdateGamePad() {
-    GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
-    KeyboardState keyState = Keyboard.GetState();
-
-    // Gamepad controls
-    position.X += gamePadState.ThumbSticks.Left.X * speed;
-    position.Y += gamePadState.ThumbSticks.Left.Y * speed;
-    zoom += gamePadState.ThumbSticks.Right.Y * speed;
-    rotationY += gamePadState.ThumbSticks.Right.X * speed;
-    if (gamePadState.Buttons.RightShoulder == ButtonState.Pressed)
-    {
-        rotationX += 1.0f * speed;
-    }
-    else if (gamePadState.Buttons.LeftShoulder == ButtonState.Pressed)
-    {
-        rotationX -= 1.0f * speed;
-    }
-
-    // Keyboard controls
-    if (keyState.IsKeyDown(Keys.A)) { position.X += 1.0f * speed; }
-    else if (keyState.IsKeyDown(Keys.D)) { position.X -= 1.0f * speed; }
-    if (keyState.IsKeyDown(Keys.W)) { zoom += 1.0f * speed; }
-    else if (keyState.IsKeyDown(Keys.S)) { zoom -= 1.0f * speed; }
-    if (keyState.IsKeyDown(Keys.E)) { rotationY += 1.0f * speed; }
-    else if (keyState.IsKeyDown(Keys.Q)) { rotationY -= 1.0f * speed; }
-
-    if (keyState.IsKeyDown(Keys.Right)) { position.Y += 1.0f * speed; }
-    else if (keyState.IsKeyDown(Keys.Left)) { position.Y -= 1.0f * speed; }
-    if (keyState.IsKeyDown(Keys.Up)) { rotationX += 1.0f * speed; }
-    else if (keyState.IsKeyDown(Keys.Down)) { rotationX -= 1.0f * speed; }
-
-    gameWorldRotation = Matrix.CreateRotationX(MathHelper.ToRadians(rotationX)) * Matrix.CreateRotationY(MathHelper.ToRadians(rotationY));
+        ground.Model = Content.Load<Model>("Models/ground");
+        fuelCarrier = new FuelCarrier();
+        fuelCarrier.LoadContent(Content, "Models/fuelcarrier");
     }
 
     protected override void Update(GameTime gameTime) {
-        UpdateGamePad();
+        lastKeyboardState = currentKeyboardState;
+        currentKeyboardState = Keyboard.GetState();
+        fuelCarrier.Update(currentKeyboardState);
+        gameCamera.Update(fuelCarrier.ForwardDirection, fuelCarrier.Position, _graphics.GraphicsDevice.Viewport.AspectRatio);   
         base.Update(gameTime);
     }
 
-    private void DrawModel(Model m) {
-        Matrix[] transforms = new Matrix[m.Bones.Count];
-        float aspectRatio = GraphicsDevice.Viewport.AspectRatio;
-        m.CopyAbsoluteBoneTransformsTo(transforms);
-        Matrix projection =
-            Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45.0f),
-            aspectRatio, 1.0f, 10000.0f);
-        Matrix view = Matrix.CreateLookAt(new Vector3(0.0f, 50.0f, zoom),
-            Vector3.Zero, Vector3.Up);
-
-        foreach (ModelMesh mesh in m.Meshes)
+    private void DrawTerrain(Model model) {
+        foreach (ModelMesh mesh in model.Meshes)
         {
             foreach (BasicEffect effect in mesh.Effects)
             {
                 effect.EnableDefaultLighting();
+                effect.PreferPerPixelLighting = true;
+                effect.World = Matrix.Identity;
 
-                effect.View = view;
-                effect.Projection = projection;
-                effect.World = gameWorldRotation *
-                    transforms[mesh.ParentBone.Index] *
-                    Matrix.CreateTranslation(position);
+                // Use the matrices provided by the game camera
+                effect.View = gameCamera.ViewMatrix;
+                effect.Projection = gameCamera.ProjectionMatrix;
             }
             mesh.Draw();
         }
     }
-
+    
     protected override void Draw(GameTime gameTime) {
-        GraphicsDevice.Clear(Color.CornflowerBlue);
-        DrawModel(_model);
+        GraphicsDevice.Clear(Color.Black);
+        DrawTerrain(ground.Model);
+        fuelCarrier.Draw(gameCamera.ViewMatrix, gameCamera.ProjectionMatrix);
         base.Draw(gameTime);
     }
+
 }
