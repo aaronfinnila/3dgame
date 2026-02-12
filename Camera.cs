@@ -8,25 +8,22 @@ public class Camera {
     public Matrix ViewMatrix { get; set; }
     public Matrix ProjectionMatrix { get; set; }
 
-    public Camera()
-    {
+    public Camera() {
         AvatarHeadOffset = new Vector3(0, 7, 15);
         TargetOffset = new Vector3(1, 5, 0);
         ViewMatrix = Matrix.Identity;
         ProjectionMatrix = Matrix.Identity;
     }
 
-    public void Update(float avatarYaw, Vector3 position, float aspectRatio)
-    {
-        Matrix rotationMatrix = Matrix.CreateRotationY(avatarYaw);
+    public void Update(float cameraYaw, float cameraPitch, Vector3 position, float aspectRatio) {
+        Matrix rotation = Matrix.CreateRotationX(cameraPitch*-1) * Matrix.CreateRotationY(cameraYaw*-1);
 
-        Vector3 transformedheadOffset = Vector3.Transform(AvatarHeadOffset, rotationMatrix);
-        Vector3 transformedReference = Vector3.Transform(TargetOffset, rotationMatrix);
+        Vector3 cameraPosition = position + AvatarHeadOffset;
 
-        Vector3 cameraPosition = position + transformedheadOffset;
-        Vector3 cameraTarget = position + transformedReference;
+        Vector3 forward = Vector3.Transform(Vector3.Forward, rotation);
 
-        //Calculate the camera's view and projection matrices based on current values.
+        Vector3 cameraTarget = cameraPosition + forward;
+        
         ViewMatrix = Matrix.CreateLookAt(cameraPosition, cameraTarget, Vector3.Up);
         ProjectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(GameConstants.ViewAngle),
             aspectRatio, GameConstants.NearClip, GameConstants.FarClip);
