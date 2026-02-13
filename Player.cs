@@ -15,27 +15,20 @@ namespace _3dgame {
             MaxRange = GameConstants.MaxRange;
         }
 
-        public void LoadContent(ContentManager content, string modelName) {
-            Model = content.Load<Model>(modelName);
-        }
-
         public void Update(KeyboardState keyboardState) {
             Vector3 futurePosition = Position;
+            Vector3 movement = Vector3.Zero;
             float turnAmount = 0;
 
-            if (keyboardState.IsKeyDown(Keys.Escape)) {
-            }
-
             if (keyboardState.IsKeyDown(Keys.A)) {
-                turnAmount = 1;
+                movement.X = -1;
             }
             else if(keyboardState.IsKeyDown(Keys.D)) {
-                turnAmount = -1;
+                movement.X = 1;
             }
             ForwardDirection += turnAmount * GameConstants.TurnSpeed;
             Matrix orientationMatrix = Matrix.CreateRotationY(ForwardDirection);
 
-            Vector3 movement = Vector3.Zero;
             if (keyboardState.IsKeyDown(Keys.W)) {
                 movement.Z = -1;
             }
@@ -53,9 +46,10 @@ namespace _3dgame {
         }
 
         private bool ValidateMovement(Vector3 futurePosition) {
-            //Do not allow off-terrain movement
-            if ((Math.Abs(futurePosition.X) > MaxRange) || (Math.Abs(futurePosition.Z) > MaxRange))
+            // do not allow off-terrain movement
+            if ((Math.Abs(futurePosition.X) > MaxRange) || (Math.Abs(futurePosition.Z) > MaxRange)) {
                 return false;
+            }
 
             return true;
         }

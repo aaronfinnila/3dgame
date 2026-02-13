@@ -16,7 +16,7 @@ public class Camera {
     }
 
     public void Update(float cameraYaw, float cameraPitch, Vector3 position, float aspectRatio) {
-        Matrix rotation = Matrix.CreateRotationX(cameraPitch*-1) * Matrix.CreateRotationY(cameraYaw*-1);
+        Matrix rotation = Matrix.CreateRotationX(cameraPitch) * Matrix.CreateRotationY(cameraYaw);
 
         Vector3 cameraPosition = position + AvatarHeadOffset;
 

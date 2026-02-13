@@ -42,14 +42,24 @@ public class Game1 : Game {
     }
 
     protected override void Update(GameTime gameTime) {
+        if (!IsActive) { base.Update(gameTime); return;}
         currentKeyboardState = Keyboard.GetState();
         previousMouseState = currentMouseState;
         currentMouseState = Mouse.GetState();
+        float maxPitchNegative = MathHelper.ToRadians(-85f);
+        float maxPitchPositive = MathHelper.ToRadians(85f);
 
         float deltaX = currentMouseState.X - screenCenterX;
         float deltaY = currentMouseState.Y - screenCenterY;
-        cameraYaw += deltaX * 0.01f;
-        cameraPitch += deltaY * 0.01f;
+        cameraYaw -= deltaX * GameConstants.sensitivity;
+        float pitchDelta = -deltaY * GameConstants.sensitivity;
+        float newPitch = cameraPitch + pitchDelta;
+
+        if (!((cameraPitch >= maxPitchPositive && pitchDelta > 0f) || (cameraPitch <= maxPitchNegative && pitchDelta < 0f))) {
+            cameraPitch = newPitch;
+        }
+        
+        cameraPitch = MathHelper.Clamp(cameraPitch, maxPitchNegative, maxPitchPositive);
 
         Mouse.SetPosition(screenCenterX, screenCenterY);
         
@@ -73,7 +83,7 @@ public class Game1 : Game {
                 effect.PreferPerPixelLighting = true;
                 effect.World = Matrix.Identity;
 
-                // Use the matrices provided by the game camera
+                // use the matrices provided by the game camera
                 effect.View = gameCamera.ViewMatrix;
                 effect.Projection = gameCamera.ProjectionMatrix;
             }
