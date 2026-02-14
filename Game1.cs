@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -7,6 +8,7 @@ namespace _3dgame;
 public class Game1 : Game {
     private GraphicsDeviceManager _graphics;
     private GameObject ground;
+    private Box[] boxes;
     private Camera gameCamera;
     private Player player;
     private KeyboardState currentKeyboardState = new KeyboardState();
@@ -16,6 +18,7 @@ public class Game1 : Game {
     private int screenCenterY;
     private float cameraYaw;
     private float cameraPitch;
+    private double logTimer = 0d;
 
     public Game1() {
         _graphics = new GraphicsDeviceManager(this);
@@ -39,10 +42,17 @@ public class Game1 : Game {
 
     protected override void LoadContent() {
         ground.Model = Content.Load<Model>("Models/ground");
+        boxes = new Box[1];
+        boxes[0] = new Box();
+        boxes[0].LoadContent(Content, "Models/box");
+        boxes[0].Position = new Vector3(0, 0, 10);
     }
 
     protected override void Update(GameTime gameTime) {
-        if (!IsActive) { base.Update(gameTime); return;}
+        if (!IsActive) {
+            base.Update(gameTime);
+            return;
+        }
         currentKeyboardState = Keyboard.GetState();
         previousMouseState = currentMouseState;
         currentMouseState = Mouse.GetState();
@@ -63,22 +73,27 @@ public class Game1 : Game {
 
         Mouse.SetPosition(screenCenterX, screenCenterY);
         
-        player.Update(currentKeyboardState);
+        player.Update(currentKeyboardState, cameraYaw);
 
         gameCamera.Update(cameraYaw, cameraPitch, player.Position, _graphics.GraphicsDevice.Viewport.AspectRatio);
 
         if (currentKeyboardState.IsKeyDown(Keys.Escape)) {
             Exit();
         }
+
+        logTimer += gameTime.ElapsedGameTime.TotalSeconds;
+
+        if (logTimer >= 3) {
+            Console.WriteLine("cameraPitch: " + cameraPitch + " cameraYaw: " + cameraYaw);
+            logTimer = 0;
+        }
         
         base.Update(gameTime);
     }
 
     private void DrawTerrain(Model model) {
-        foreach (ModelMesh mesh in model.Meshes)
-        {
-            foreach (BasicEffect effect in mesh.Effects)
-            {
+        foreach (ModelMesh mesh in model.Meshes) {
+            foreach (BasicEffect effect in mesh.Effects) {
                 effect.EnableDefaultLighting();
                 effect.PreferPerPixelLighting = true;
                 effect.World = Matrix.Identity;
@@ -94,7 +109,10 @@ public class Game1 : Game {
     protected override void Draw(GameTime gameTime) {
         GraphicsDevice.Clear(Color.Black);
         DrawTerrain(ground.Model);
+        foreach (Box box in boxes) {
+            box.Draw(gameCamera.ViewMatrix, gameCamera.ProjectionMatrix);
+        }
+        
         base.Draw(gameTime);
     }
-
 }

@@ -1,6 +1,4 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 
@@ -15,10 +13,9 @@ namespace _3dgame {
             MaxRange = GameConstants.MaxRange;
         }
 
-        public void Update(KeyboardState keyboardState) {
+        public void Update(KeyboardState keyboardState, float cameraYaw) {
             Vector3 futurePosition = Position;
             Vector3 movement = Vector3.Zero;
-            float turnAmount = 0;
 
             if (keyboardState.IsKeyDown(Keys.A)) {
                 movement.X = -1;
@@ -26,15 +23,15 @@ namespace _3dgame {
             else if(keyboardState.IsKeyDown(Keys.D)) {
                 movement.X = 1;
             }
-            ForwardDirection += turnAmount * GameConstants.TurnSpeed;
-            Matrix orientationMatrix = Matrix.CreateRotationY(ForwardDirection);
-
             if (keyboardState.IsKeyDown(Keys.W)) {
                 movement.Z = -1;
             }
             else if(keyboardState.IsKeyDown(Keys.S)) {
                 movement.Z = 1;
             }
+
+            ForwardDirection = cameraYaw;
+            Matrix orientationMatrix = Matrix.CreateRotationY(ForwardDirection);
 
             Vector3 speed = Vector3.Transform(movement, orientationMatrix);
             speed *= GameConstants.Velocity;
