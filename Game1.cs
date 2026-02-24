@@ -7,6 +7,7 @@ namespace _3dgame;
 public class Game1 : Game {
     private GraphicsDeviceManager _graphics;
     private GameObject ground;
+    private Dragon dragon;
     private Box[] boxes;
     private Camera gameCamera;
     private Player player;
@@ -42,12 +43,15 @@ public class Game1 : Game {
     protected override void LoadContent() {
         ground.Model = Content.Load<Model>("Models/ground");
         boxes = new Box[2];
+        dragon = new Dragon();
         boxes[0] = new Box();
         boxes[0].LoadContent(Content, "Models/box");
         boxes[0].Position = new Vector3(0, 10, -20);
         boxes[1] = new Box();
         boxes[1].LoadContent(Content, "Models/biggerbox");
         boxes[1].Position = new Vector3(0, 5, 25);
+        dragon.LoadContent(Content, "Models/Dragon");
+        dragon.Position = new Vector3(0, 35, 35);
     }
 
     protected override void Update(GameTime gameTime) {
@@ -114,6 +118,7 @@ public class Game1 : Game {
         foreach (Box box in boxes) {
             box.Draw(gameCamera.ViewMatrix, gameCamera.ProjectionMatrix);
         }
+        dragon.Draw(gameCamera.ViewMatrix, gameCamera.ProjectionMatrix);
         
         base.Draw(gameTime);
     }
