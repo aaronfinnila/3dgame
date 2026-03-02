@@ -12,7 +12,6 @@ public class Game1 : Game {
     private Texture2D dragonBumpCol2;
     private Texture2D dragonNorMirror2;
     private Texture2D dragonFloorC;
-    private Box[] boxes;
     private Camera gameCamera;
     private Player player;
     private KeyboardState currentKeyboardState = new KeyboardState();
@@ -48,7 +47,7 @@ public class Game1 : Game {
         ground.Model = Content.Load<Model>("Models/ground");
         dragon = new Dragon();
         dragon.LoadContent(Content, "Models/Dragon");
-        dragon.Position = new Vector3(0, 35, 35);
+        dragon.Position = new Vector3(0, 0, 35);
         dragonGroundColor = Content.Load<Texture2D>("Textures/Dragon_ground_color");
         dragonBumpCol2 = Content.Load<Texture2D>("Textures/Dragon_Bump_Col2");
         dragonNorMirror2 = Content.Load<Texture2D>("Textures/Dragon_Nor_mirror2");
@@ -81,6 +80,8 @@ public class Game1 : Game {
         Mouse.SetPosition(screenCenterX, screenCenterY);
         
         player.Update(currentKeyboardState, cameraYaw);
+
+        dragon.Update(currentKeyboardState);
 
         gameCamera.Update(cameraYaw, cameraPitch, player.Position, _graphics.GraphicsDevice.Viewport.AspectRatio);
 
@@ -131,9 +132,9 @@ public class Game1 : Game {
     }
     
     protected override void Draw(GameTime gameTime) {
-        GraphicsDevice.Clear(Color.Black);
+        GraphicsDevice.Clear(Color.WhiteSmoke);
         DrawTerrain(ground.Model);
-        DrawTextures(dragon.Model);
+/*         DrawTextures(dragon.Model); */
         dragon.Draw(gameCamera.ViewMatrix, gameCamera.ProjectionMatrix);
         
         base.Draw(gameTime);
