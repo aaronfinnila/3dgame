@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -7,11 +8,7 @@ namespace _3dgame;
 public class Game1 : Game {
     private GraphicsDeviceManager _graphics;
     private GameObject ground;
-    private Dragon dragon;
-    private Texture2D dragonGroundColor;
-    private Texture2D dragonBumpCol2;
-    private Texture2D dragonNorMirror2;
-    private Texture2D dragonFloorC;
+    private GameObject cottage;
     private Camera gameCamera;
     private Player player;
     private KeyboardState currentKeyboardState = new KeyboardState();
@@ -33,6 +30,7 @@ public class Game1 : Game {
 
     protected override void Initialize() {
         ground = new GameObject();
+        cottage = new GameObject();
         gameCamera = new Camera();
         player = new Player();
         screenCenterX = GraphicsDevice.Viewport.Width/2;
@@ -45,13 +43,7 @@ public class Game1 : Game {
 
     protected override void LoadContent() {
         ground.Model = Content.Load<Model>("Models/ground");
-        dragon = new Dragon();
-        dragon.LoadContent(Content, "Models/Dragon");
-        dragon.Position = new Vector3(0, 0, 35);
-        dragonGroundColor = Content.Load<Texture2D>("Textures/Dragon_ground_color");
-        dragonBumpCol2 = Content.Load<Texture2D>("Textures/Dragon_Bump_Col2");
-        dragonNorMirror2 = Content.Load<Texture2D>("Textures/Dragon_Nor_mirror2");
-        dragonFloorC = Content.Load<Texture2D>("Textures/Floor_C");
+        cottage.Model = Content.Load<Model>("Models/cottage");
     }
 
     protected override void Update(GameTime gameTime) {
@@ -81,8 +73,6 @@ public class Game1 : Game {
         
         player.Update(currentKeyboardState, cameraYaw);
 
-        dragon.Update(currentKeyboardState);
-
         gameCamera.Update(cameraYaw, cameraPitch, player.Position, _graphics.GraphicsDevice.Viewport.AspectRatio);
 
         if (currentKeyboardState.IsKeyDown(Keys.Escape)) {
@@ -92,7 +82,7 @@ public class Game1 : Game {
         logTimer += gameTime.ElapsedGameTime.TotalSeconds;
 
         if (logTimer >= 3) {
-            /* Console.WriteLine("cameraPitch: " + cameraPitch + " cameraYaw: " + cameraYaw); */
+            Console.WriteLine("posX: " + player.Position.X + " posY: " + player.Position.Y + " poxZ: " + player.Position.Z);
             logTimer = 0;
         }
         
@@ -120,7 +110,6 @@ public class Game1 : Game {
                 effect.EnableDefaultLighting();
                 effect.PreferPerPixelLighting = true;
                 effect.TextureEnabled = true;
-                effect.Texture = dragonBumpCol2;
                 effect.World = Matrix.Identity;
 
                 // use the matrices provided by the game camera
@@ -134,8 +123,7 @@ public class Game1 : Game {
     protected override void Draw(GameTime gameTime) {
         GraphicsDevice.Clear(Color.WhiteSmoke);
         DrawTerrain(ground.Model);
-/*         DrawTextures(dragon.Model); */
-        dragon.Draw(gameCamera.ViewMatrix, gameCamera.ProjectionMatrix);
+        DrawTextures(cottage.Model);
         
         base.Draw(gameTime);
     }

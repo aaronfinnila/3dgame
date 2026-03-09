@@ -8,7 +8,8 @@ namespace _3dgame {
         public const float sensitivity = 0.0025f;
         // player movement constants
         public const float Velocity = 0.75f;
-        public const int MaxRange = 98;
+        public const int MaxRange = 990;
         public const float HeightOffset = 2;
+        public const float JumpHeight = 13;
     }
 }
