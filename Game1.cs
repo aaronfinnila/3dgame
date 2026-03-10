@@ -9,7 +9,7 @@ namespace _3dgame;
 public class Game1 : Game {
     private GraphicsDeviceManager graphics;
     private GameObject ground;
-    private GameObject cottage;
+    private GameObject house;
     private Camera gameCamera;
     private GameObject boundingSphere;
     private Player player;
@@ -32,7 +32,7 @@ public class Game1 : Game {
 
     protected override void Initialize() {
         ground = new GameObject();
-        cottage = new GameObject();
+        house = new GameObject();
         gameCamera = new Camera();
         boundingSphere = new GameObject();
         player = new Player();
@@ -46,9 +46,10 @@ public class Game1 : Game {
 
     protected override void LoadContent() {
         ground.Model = Content.Load<Model>("Models/ground");
-        cottage.Model = Content.Load<Model>("Models/cottage");
+        house.Model = Content.Load<Model>("Models/house");
         boundingSphere.Model = Content.Load<Model>("Models/sphere1uR");
-        cottage.BoundingSphere = cottage.CalculateBoundingSphere();
+        house.BoundingSphere = house.CalculateBoundingSphere();
+        player.Model = Content.Load<Model>("Models/player");
         player.CalculateBoundingSphere();
     }
 
@@ -77,7 +78,7 @@ public class Game1 : Game {
 
         Mouse.SetPosition(screenCenterX, screenCenterY);
         
-        player.Update(currentKeyboardState, cameraYaw, cottage.BoundingSphere);
+        player.Update(currentKeyboardState, cameraYaw, house.BoundingSphere);
 
         gameCamera.Update(cameraYaw, cameraPitch, player.Position, graphics.GraphicsDevice.Viewport.AspectRatio);
 
@@ -129,9 +130,9 @@ public class Game1 : Game {
     protected override void Draw(GameTime gameTime) {
         GraphicsDevice.Clear(Color.WhiteSmoke);
         DrawTerrain(ground.Model);
-        DrawTextures(cottage.Model);
+        DrawTextures(house.Model);
         ChangeRasterizerState(FillMode.WireFrame);
-        cottage.DrawBoundingSphere(gameCamera.ViewMatrix, gameCamera.ProjectionMatrix, boundingSphere);
+        house.DrawBoundingSphere(gameCamera.ViewMatrix, gameCamera.ProjectionMatrix, boundingSphere);
         ChangeRasterizerState(FillMode.Solid);
         
         base.Draw(gameTime);
