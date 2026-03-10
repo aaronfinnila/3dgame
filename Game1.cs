@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -6,10 +7,11 @@ using Microsoft.Xna.Framework.Input;
 namespace _3dgame;
 
 public class Game1 : Game {
-    private GraphicsDeviceManager _graphics;
+    private GraphicsDeviceManager graphics;
     private GameObject ground;
     private GameObject cottage;
     private Camera gameCamera;
+    private GameObject boundingSphere;
     private Player player;
     private KeyboardState currentKeyboardState = new KeyboardState();
     private MouseState currentMouseState = new MouseState();
@@ -21,10 +23,10 @@ public class Game1 : Game {
     private double logTimer = 0d;
 
     public Game1() {
-        _graphics = new GraphicsDeviceManager(this);
+        graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
-        _graphics.SynchronizeWithVerticalRetrace = true;
-        _graphics.ApplyChanges();
+        graphics.SynchronizeWithVerticalRetrace = true;
+        graphics.ApplyChanges();
         IsMouseVisible = false;
     }
 
@@ -32,6 +34,7 @@ public class Game1 : Game {
         ground = new GameObject();
         cottage = new GameObject();
         gameCamera = new Camera();
+        boundingSphere = new GameObject();
         player = new Player();
         screenCenterX = GraphicsDevice.Viewport.Width/2;
         screenCenterY = GraphicsDevice.Viewport.Height/2;
@@ -44,6 +47,9 @@ public class Game1 : Game {
     protected override void LoadContent() {
         ground.Model = Content.Load<Model>("Models/ground");
         cottage.Model = Content.Load<Model>("Models/cottage");
+        boundingSphere.Model = Content.Load<Model>("Models/sphere1uR");
+        cottage.BoundingSphere = cottage.CalculateBoundingSphere();
+        player.CalculateBoundingSphere();
     }
 
     protected override void Update(GameTime gameTime) {
@@ -71,9 +77,9 @@ public class Game1 : Game {
 
         Mouse.SetPosition(screenCenterX, screenCenterY);
         
-        player.Update(currentKeyboardState, cameraYaw);
+        player.Update(currentKeyboardState, cameraYaw, cottage.BoundingSphere);
 
-        gameCamera.Update(cameraYaw, cameraPitch, player.Position, _graphics.GraphicsDevice.Viewport.AspectRatio);
+        gameCamera.Update(cameraYaw, cameraPitch, player.Position, graphics.GraphicsDevice.Viewport.AspectRatio);
 
         if (currentKeyboardState.IsKeyDown(Keys.Escape)) {
             Exit();
@@ -124,7 +130,19 @@ public class Game1 : Game {
         GraphicsDevice.Clear(Color.WhiteSmoke);
         DrawTerrain(ground.Model);
         DrawTextures(cottage.Model);
+        ChangeRasterizerState(FillMode.WireFrame);
+        cottage.DrawBoundingSphere(gameCamera.ViewMatrix, gameCamera.ProjectionMatrix, boundingSphere);
+        ChangeRasterizerState(FillMode.Solid);
         
         base.Draw(gameTime);
+    }
+
+    private RasterizerState ChangeRasterizerState(FillMode fillmode, CullMode cullMode = CullMode.None) {
+        RasterizerState rasterizerState = new RasterizerState() { 
+            FillMode = fillmode,
+            CullMode = cullMode 
+        };
+        graphics.GraphicsDevice.RasterizerState = rasterizerState;
+        return rasterizerState;
     }
 }

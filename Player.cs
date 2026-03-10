@@ -9,15 +9,23 @@ namespace _3dgame {
         private float movementDirection = 0;
         private bool reachedApex = false;
         private bool reachedBottom = true;
-        private Vector3 startPosition = new Vector3(0, GameConstants.HeightOffset, 0);
+        private Vector3 startPosition = new Vector3(30, GameConstants.HeightOffset, 125);
         public Player() : base() {
             ForwardDirection = 0.0f;
             Position = startPosition;
         }
 
-        public void Update(KeyboardState keyboardState, float cameraYaw) {
+        public void Update(KeyboardState keyboardState, float cameraYaw, BoundingSphere boundingSphere) {
             Vector3 futurePosition = Position;
             Vector3 movement = Vector3.Zero;
+
+            
+            BoundingSphere updatedSphere;
+            updatedSphere = BoundingSphere;
+            updatedSphere.Center.X = Position.X;
+            updatedSphere.Center.Y = Position.Y;
+            updatedSphere.Radius = 1;
+            BoundingSphere = new BoundingSphere(updatedSphere.Center, updatedSphere.Radius);
 
             if (keyboardState.IsKeyDown(Keys.A)) {
                 movement.X = -1;
@@ -46,14 +54,18 @@ namespace _3dgame {
             speed *= GameConstants.Velocity;
             futurePosition = Position + speed;
 
-            if (ValidateMovement(futurePosition)) {
+            if (ValidateMovement(futurePosition, boundingSphere)) {
                 Position = futurePosition;
             }
         }
 
-        private bool ValidateMovement(Vector3 futurePosition) {
+        private bool ValidateMovement(Vector3 futurePosition, BoundingSphere boundingSphere) {
             // do not allow off-terrain movement
             if ((Math.Abs(futurePosition.X) > GameConstants.MaxRange) || (Math.Abs(futurePosition.Z) > GameConstants.MaxRange)) {
+                return false;
+            }
+            // house collision
+            if (boundingSphere.Intersects(this.BoundingSphere)) {
                 return false;
             }
 
