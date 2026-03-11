@@ -83,13 +83,14 @@ namespace _3dgame {
 
             // house collision
             if (futureSphere.Intersects(houseBoundingSphere)) {
-/*                 Console.WriteLine("house intersects"); */
+/*              Console.WriteLine("house intersects"); */
                 return false;
             }
 
             return true;
         }
 
+        // TODO: fix jump method to work at different altitudes (now doesn't work when altitude is higher than GameConstants.JumpHeight)
         private float PlayerJump() {
             Vector3 position = Position;
             if (reachedApex == false && reachedBottom == true) {
