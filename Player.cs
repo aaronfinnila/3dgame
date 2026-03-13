@@ -7,6 +7,7 @@ namespace _3dgame {
     public class Player : GameObject {
         public float ForwardDirection { get; set; }
         private bool jumpStarted = false;
+        private float jumpStartY;
         private float movementDirection = 0;
         private bool reachedApex = false;
         private bool reachedBottom = true;
@@ -34,8 +35,9 @@ namespace _3dgame {
             else if (keyboardState.IsKeyDown(Keys.S)) {
                 movement.Z = 1;
             }
-            if (keyboardState.IsKeyDown(Keys.Space)) {
+            if (keyboardState.IsKeyDown(Keys.Space) && !jumpStarted) {
                 jumpStarted = true;
+                jumpStartY = Position.Y;
             }
 
             if (jumpStarted) {
@@ -58,6 +60,10 @@ namespace _3dgame {
             speed *= GameConstants.Velocity;
 
             futurePosition.Y += speed.Y;
+
+            if (!jumpStarted && futurePosition.Y != jumpStartY) {
+                futurePosition.Y = jumpStartY;
+            }
 
             Vector3 futureX = Position + new Vector3(speed.X, 0, 0);
             if (ValidateMovement(futureX, houseBoundingSphere)) {
@@ -90,23 +96,24 @@ namespace _3dgame {
             return true;
         }
 
-        // TODO: fix jump method to work at different altitudes (now doesn't work when altitude is higher than GameConstants.JumpHeight)
         private float PlayerJump() {
             Vector3 position = Position;
             if (reachedApex == false && reachedBottom == true) {
                 movementDirection = 0.8f;
             }
-            if (position.Y >= GameConstants.JumpHeight && reachedApex == false) {
+            if (position.Y >= jumpStartY + GameConstants.JumpHeight && reachedApex == false) {
                 reachedApex = true;
                 reachedBottom = false;
             }
             if (reachedApex == true) {
                 movementDirection = -0.9f;
             }
-            if (position.Y <= GameConstants.HeightOffset && reachedBottom == false) {
+            if (position.Y <= jumpStartY && reachedBottom == false) {
                 jumpStarted = false;
                 reachedBottom = true;
                 reachedApex = false;
+                position.Y = jumpStartY;
+                Position = position;
                 movementDirection = 0;
             }
             return movementDirection;
