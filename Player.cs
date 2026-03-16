@@ -17,7 +17,7 @@ namespace _3dgame {
             Position = startPosition;
         }
 
-        public void Update(KeyboardState keyboardState, float cameraYaw, BoundingSphere houseBoundingSphere) {
+        public void Update(KeyboardState keyboardState, float cameraYaw, BoundingBox houseBoundingBox) {
             Vector3 futurePosition = Position;
             Vector3 movement = Vector3.Zero;
             
@@ -66,19 +66,19 @@ namespace _3dgame {
             }
 
             Vector3 futureX = Position + new Vector3(speed.X, 0, 0);
-            if (ValidateMovement(futureX, houseBoundingSphere)) {
+            if (ValidateMovement(futureX, houseBoundingBox)) {
                 futurePosition.X = futureX.X;
             }
 
             Vector3 futureZ = futurePosition + new Vector3(0, 0, speed.Z);
-            if (ValidateMovement(futureZ, houseBoundingSphere)) {
+            if (ValidateMovement(futureZ, houseBoundingBox)) {
                 futurePosition.Z = futureZ.Z;
             }
             Position = futurePosition;
             BoundingSphere = new BoundingSphere(Position, 1f);
         }
 
-        private bool ValidateMovement(Vector3 futurePosition, BoundingSphere houseBoundingSphere) {
+        private bool ValidateMovement(Vector3 futurePosition, BoundingBox houseBoundingBox) {
             // do not allow off-terrain movement
             if ((Math.Abs(futurePosition.X) > GameConstants.MaxRange) || (Math.Abs(futurePosition.Z) > GameConstants.MaxRange)) {
                 return false;
@@ -88,7 +88,7 @@ namespace _3dgame {
             BoundingSphere futureSphere = new BoundingSphere(futurePosition, BoundingSphere.Radius);
 
             // house collision
-            if (futureSphere.Intersects(houseBoundingSphere)) {
+            if (futureSphere.Intersects(houseBoundingBox)) {
 /*              Console.WriteLine("house intersects"); */
                 return false;
             }

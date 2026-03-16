@@ -8,6 +8,7 @@ public class GameObject {
     public Vector3 Position { get; set; }
     public bool IsActive { get; set; }
     public BoundingSphere BoundingSphere { get; set; }
+    public BoundingBox BoundingBox { get; set; }
 
     public GameObject() {
         Model = null;
@@ -37,6 +38,17 @@ public class GameObject {
         }
         mergedSphere.Center.Y = mergedSphere.Radius / 2;
         return mergedSphere;
+    }
+
+    public BoundingBox CalculateBoundingBox() {
+        BoundingSphere = CalculateBoundingSphere();
+        BoundingBox = BoundingBox.CreateFromSphere(BoundingSphere);
+        BoundingBox boundingBox = BoundingBox;
+        boundingBox.Max.X -= 15;
+        boundingBox.Min.X += 35;
+        boundingBox.Max.Z -= 35;
+        BoundingBox = boundingBox;
+        return BoundingBox;
     }
 
     internal void DrawBoundingSphere(Matrix view, Matrix projection, GameObject boundingSphereModel) {

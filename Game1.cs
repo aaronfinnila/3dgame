@@ -48,7 +48,7 @@ public class Game1 : Game {
         ground.Model = Content.Load<Model>("Models/ground");
         house.Model = Content.Load<Model>("Models/house");
         boundingSphere.Model = Content.Load<Model>("Models/sphere1uR");
-        house.BoundingSphere = house.CalculateBoundingSphere();
+        house.BoundingBox = house.CalculateBoundingBox();
         player.Model = Content.Load<Model>("Models/player");
         player.CalculateBoundingSphere();
     }
@@ -78,7 +78,7 @@ public class Game1 : Game {
 
         Mouse.SetPosition(screenCenterX, screenCenterY);
         
-        player.Update(currentKeyboardState, cameraYaw, house.BoundingSphere);
+        player.Update(currentKeyboardState, cameraYaw, house.BoundingBox);
 
         gameCamera.Update(cameraYaw, cameraPitch, player.Position, graphics.GraphicsDevice.Viewport.AspectRatio);
 
@@ -89,7 +89,7 @@ public class Game1 : Game {
         logTimer += gameTime.ElapsedGameTime.TotalSeconds;
 
         if (logTimer >= 3) {
-            Console.WriteLine("posX: " + player.Position.X + " posY: " + player.Position.Y + " poxZ: " + player.Position.Z);
+            Console.WriteLine("posX: " + player.Position.X + " posY: " + player.Position.Y + " posZ: " + player.Position.Z);
             logTimer = 0;
         }
         
