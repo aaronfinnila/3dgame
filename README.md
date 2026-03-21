@@ -1,6 +1,6 @@
 # 3D Game
 
-A first-person 3D exploration game built with MonoGame. Explore a terrain with a house/cottage structure, featuring player movement, jumping mechanics, and collision detection.
+A first-person 3D exploration game built with MonoGame, featuring player movement, jumping mechanics, 3D camera functionality, and collision detection.
 
 ## Technologies
 
@@ -13,20 +13,8 @@ A first-person 3D exploration game built with MonoGame. Explore a terrain with a
 - First-person camera with mouse look
 - WASD movement relative to camera direction
 - Jump mechanics with gravity physics
-- Collision detection (bounding spheres and boxes)
+- Collision detection
 - 3D model rendering with textures and lighting
-
-## Controls
-
-| Key       | Action        |
-|-----------|---------------|
-| W         | Move forward  |
-| S         | Move backward |
-| A         | Strafe left   |
-| D         | Strafe right  |
-| Space     | Jump          |
-| Mouse     | Look around   |
-| Escape    | Exit game     |
 
 ## Prerequisites
 
@@ -83,7 +71,3 @@ This game uses MonoGame.Framework.DesktopGL, providing cross-platform support fo
 - Windows
 - Linux
 - macOS
-
-## License
-
-See LICENSE file for details.
